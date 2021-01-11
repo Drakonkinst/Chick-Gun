@@ -27,6 +27,9 @@ const Breakable = (() => {
             if(this.damageTicks > 0) {
                 this.damageTicks--;
             }
+            if(this.width <= 1) {
+                this.shouldDestroy = true;
+            }
         }
         
         setHealth(health) {
@@ -49,6 +52,7 @@ const Breakable = (() => {
             }
             
             this.setHealth(this.health - count);
+            this.width -= 5;
             this.damageTicks = DAMAGE_TICKS;
         }
         

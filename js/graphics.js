@@ -43,7 +43,7 @@ const Graphics = (() => {
         },
         
         drawUI() {
-            let numObjects = Game.getWorld().gameObjectList.length + 1; // + player
+            let numObjects = Game.getWorld().gameObjectList.length;
             stroke(0);
             textAlign(LEFT);
             text("Number of Game Objects: " + numObjects, 25, 25);
@@ -129,8 +129,8 @@ const Graphics = (() => {
         
         drawBullet(bullet) {
             noStroke();
-            fill(bullet.color);
-            ellipse(bullet.pos.x, bullet.pos.y, bullet.size);
+            fill(bullet.options.color);
+            ellipse(bullet.pos.x, bullet.pos.y, bullet.options.size);
         },
         
         drawBreakable(breakable) {

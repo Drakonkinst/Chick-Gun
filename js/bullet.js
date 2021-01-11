@@ -1,24 +1,32 @@
 const Bullet = (() => {
+    const DEFAULT_SIZE = 10.0;
+    const DEFAULT_SPEED = 10.0;
+    const DEFAULT_COLOR = "blue";
+    const DEFAULT_DAMAGE = 1;
+    function setIfEmpty(obj, prop, value) {
+        if(!obj.hasOwnProperty(prop)) {
+            obj[prop] = value;
+        }    
+    }
+    
     return class Bullet extends GameObject {
-        constructor(size, speed, color, damage) {
+        constructor(options) {
             super(Vector.of(-100, -100));
-            this.size = size;
-            this.speed = speed;
-            this.color = color;
-            this.damage = damage || 1;
+            this.options = options;
+            setIfEmpty(this.options, "size", DEFAULT_SIZE);
+            setIfEmpty(this.options, "speed", DEFAULT_SPEED);
+            setIfEmpty(this.options, "color", DEFAULT_COLOR);
+            setIfEmpty(this.options, "damage", DEFAULT_DAMAGE);
+            setIfEmpty(this.options, "isBouncy", false);
             this.template = true;
-            this.isBouncy = false;
         }
         
         create(pos, facing) {
-            let bullet = new Bullet(this.size, this.speed, this.color, this.damage);
+            let bullet = new Bullet(this.options);
             bullet.pos = pos.copy();
             bullet.facing = facing;
-            bullet.velocity = Vector.of(FastMath.cos(facing), FastMath.sin(facing)).scale(this.speed);
+            bullet.velocity = Vector.of(FastMath.cos(facing), FastMath.sin(facing)).scale(this.options.speed);
             bullet.template = false;
-            // todo: make an "options" object so we dont have to rewrite this for every bullet property - { isBouncy: true }
-            // todo: can also apply this to the fundamental properties
-            bullet.isBouncy = this.isBouncy;
             return bullet;
         }
         
@@ -42,7 +50,7 @@ const Bullet = (() => {
                     if(gameObject instanceof Breakable) {
                         gameObject.damage(this.damage);
                         
-                        if(this.isBouncy) {
+                        if(this.options.isBouncy) {
                             // TODO if optimization needed, add a vector method to scale components
                             if(collisionResult === 1) {
                                 // hit horizontal side, reverse x velocity sign
