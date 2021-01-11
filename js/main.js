@@ -33,7 +33,7 @@ const Game = (() => {
         
         // called after initialization
         Start() {
-            for(let i = 0; i < 25; i++) {
+            for(let i = 0; i < 50; i++) {
                 world.addGameObject(new Breakable(randomPos(), Math.random() * 26 + 50, randomColor(), Math.random() * 5 + 3));
             }
         },

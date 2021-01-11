@@ -7,9 +7,14 @@ const World = (() => {
             this.height = height;
             this.gameObjectList = [];
             this.gameObjectMap = new SpatialHashMap(CELL_SIZE);
+            this.isPaused = false;
         }
         
         update() {
+            if(this.isPaused) {
+                return;
+            }
+            
             //Game.getPlayer().update();
             
             let wasDestroyed = false;

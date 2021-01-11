@@ -44,7 +44,8 @@ const Bullet = (() => {
             //let gameObjectList = Game.getWorld().gameObjectList;
             
             for(let gameObject of gameObjectList) {
-                if(gameObject === this) {
+                if(gameObject === this || gameObject instanceof Bullet) {
+                    // bullets don't collide with each other
                     continue;
                 }
                 // we could do circle intersection with a dynamic hitbox, but

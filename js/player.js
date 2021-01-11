@@ -2,7 +2,7 @@ const Player = (() => {
     const LEFT_TARGET = Vector.of(100, 400);
     const RIGHT_TARGET = Vector.of(900, 400);
     
-    const Gun1 = new Gun("gun1", "Gun", 10.0, 25.0, 5.0, function (anchor, dir, gun) {
+    const Gun1 = new Gun("gun1", "Gun", 10.0, 25.0, 5.0, 3.5, function (anchor, dir, gun) {
         let offset = Graphics.toRadians(15.0);
         let bulletTemplate = new Bullet({
             "size": 10,
@@ -16,7 +16,7 @@ const Player = (() => {
         gun.fireBullet(anchor, dir + offset, bulletTemplate);
         gun.fireBullet(anchor, dir - offset, bulletTemplate);
     });
-    const Gun2 = new Gun("gun2", "Gun", 7.5, 35.0, 5.0, function (anchor, dir, gun) {
+    const Gun2 = new Gun("gun2", "Gun", 7.5, 35.0, 5.0, 7.5, function (anchor, dir, gun) {
         let bulletTemplate = new Bullet({
             "size": 15,
             "speed": 5.0,
@@ -31,11 +31,10 @@ const Player = (() => {
         constructor() {
             super(LEFT_TARGET.x, LEFT_TARGET.y);
             this.inventory = new Inventory();
-            this.setFireRate(5.0);
             this.maxVelocity = 2.0;
             
             this.target = RIGHT_TARGET;
-            this.currentGun = Gun1;
+            this.setCurrentGun(Gun1);
         }
         
         setFireRate(rate) {
@@ -85,10 +84,15 @@ const Player = (() => {
         
         toggleGun() {
             if(this.currentGun === Gun1) {
-                this.currentGun = Gun2;
+                this.setCurrentGun(Gun2);
             } else {
-                this.currentGun = Gun1;
+                this.setCurrentGun(Gun1);
             }
+        }
+        
+        setCurrentGun(gun) {
+            this.currentGun = gun;
+            this.setFireRate(gun.fireRate);
         }
     };
 })();

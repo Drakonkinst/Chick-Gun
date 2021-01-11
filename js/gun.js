@@ -1,11 +1,12 @@
 const Gun = (() => {
     return class Gun {
-        constructor(id, name, width, frontLength, backLength, onFire) {
+        constructor(id, name, width, frontLength, backLength, fireRate, onFire) {
             this.id = id;
             this.name = name;
             this.width = width;
             this.frontLength = frontLength;
             this.backLength = backLength;
+            this.fireRate = fireRate;
             this.onFire = onFire;
         }
         
