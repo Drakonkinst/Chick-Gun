@@ -16,7 +16,7 @@ const Graphics = (() => {
         strokeWeight(1);
         fill(255);
         textAlign(CENTER, CENTER);
-        textSize(16);
+        textSize(15);
     }
     
     return {
@@ -28,27 +28,15 @@ const Graphics = (() => {
             createCanvas(world.width, world.height);
         },
         
-        getBulletAnchor() {
-            let playerPos = Game.getPlayer().pos;
-            let x = playerPos.x;
-            let y = playerPos.y;
-            let mousePos = Input.getMousePos();
-            let dir = Math.atan2(mousePos.y - playerPos.y, mousePos.x - playerPos.x);
-            const lengthFront = 50.0;
-
-            let frontX = x + (lengthFront / 2) * Math.cos(dir);
-            let frontY = y + (lengthFront / 2) * Math.sin(dir);
-            return Vector.of(frontX, frontY);
-        },
-        
         draw() {
             clear();
             reset();
             background(200);
             
+            
+            
             this.drawGameObjects();
-            this.drawUnit(Game.getPlayer());
-            this.drawGun(Game.getPlayer().pos);
+            this.drawPlayer();
             
             this.drawUI();
             
@@ -59,15 +47,31 @@ const Graphics = (() => {
             stroke(0);
             textAlign(LEFT);
             text("Number of Game Objects: " + numObjects, 25, 25);
+            text("CLICK to Fire, SCROLL to Select Weapon", 25, 40);
         },
         
         drawGameObjects() {
             let gameObjects = Game.getWorld().gameObjectList;
             for(let gameObject of gameObjects) {
+                if(gameObject === Game.getPlayer()) {
+                    continue;
+                }
                 if(gameObject instanceof Bullet) {
                     this.drawBullet(gameObject);
+                } else if(gameObject instanceof Breakable) {
+                    this.drawBreakable(gameObject);
                 }
             }    
+        },
+        
+        drawPlayer() {
+            let player = Game.getPlayer();
+            let mousePos = Input.getMousePos();
+            let x = player.pos.x;
+            let y = player.pos.y;
+            let dir = Math.atan2(mousePos.y - y, mousePos.x - x);
+            this.drawUnit(player);
+            this.drawGun(player.pos, dir, player.currentGun);
         },
         
         drawUnit: (() => {
@@ -97,24 +101,21 @@ const Graphics = (() => {
         })(),
         
         // TODO player gun only for now but enemies could have guns later
-        drawGun(anchorPos) {
-            let playerPos = Game.getPlayer().pos;
-            let x = playerPos.x;
-            let y = playerPos.y;
-            let mousePos = Input.getMousePos();
-            let dir = Math.atan2(mousePos.y - playerPos.y, mousePos.x - playerPos.x);
+        drawGun(anchorPos, dir, gun) {
+            const x = anchorPos.x;
+            const y = anchorPos.y;
+            const width = gun.width;
+            const lengthFront = gun.frontLength;
+            const lengthBack = gun.backLength;
+            
             const offset = Graphics.toRadians(90.0);
             let leftDir = dir + offset;
             let rightDir = dir - offset;
             
-            const width = 10.0;
-            const lengthFront = 50.0;
-            const lengthBack = 10.0;
-            
-            let backX = x - (lengthBack / 2) * Math.cos(dir);
-            let backY = y - (lengthBack / 2) * Math.sin(dir);
-            let frontX = x + (lengthFront / 2) * Math.cos(dir);
-            let frontY = y + (lengthFront / 2) * Math.sin(dir);
+            let backX = x - lengthBack * Math.cos(dir);
+            let backY = y - lengthBack * Math.sin(dir);
+            let frontX = x + lengthFront * Math.cos(dir);
+            let frontY = y + lengthFront * Math.sin(dir);
             
             fill("black");
             beginShape();
@@ -128,8 +129,20 @@ const Graphics = (() => {
         
         drawBullet(bullet) {
             noStroke();
-            fill("blue");
-            ellipse(bullet.pos.x, bullet.pos.y, 10);
+            fill(bullet.color);
+            ellipse(bullet.pos.x, bullet.pos.y, bullet.size);
+        },
+        
+        drawBreakable(breakable) {
+            if(breakable.damageTicks > 0) {
+                fill("red");
+            } else {
+                fill(breakable.color);
+            }
+            
+            let halfWidth = breakable.width / 2;
+            
+            rect(breakable.pos.x - halfWidth, breakable.pos.y - halfWidth, breakable.width, breakable.width);
         }
     };
 })();

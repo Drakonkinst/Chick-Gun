@@ -2,14 +2,27 @@ const Player = (() => {
     const LEFT_TARGET = Vector.of(100, 400);
     const RIGHT_TARGET = Vector.of(900, 400);
     
+    const Gun1 = new Gun("gun1", "Gun", 10.0, 25.0, 5.0, function (anchor, dir, gun) {
+        let offset = Graphics.toRadians(15.0);
+        let bulletTemplate = new Bullet(10, 20.0, "blue", 1);
+        gun.fireBullet(anchor, dir, bulletTemplate);
+        gun.fireBullet(anchor, dir + offset, bulletTemplate);
+        gun.fireBullet(anchor, dir - offset, bulletTemplate);
+    });
+    const Gun2 = new Gun("gun2", "Gun", 7.5, 35.0, 5.0, function (anchor, dir, gun) {
+        let bulletTemplate = new Bullet(10, 10.0, "orange", 1);
+        gun.fireBullet(anchor, dir, bulletTemplate);
+    });
+    
     return class Player extends Unit {
         constructor() {
             super(LEFT_TARGET.x, LEFT_TARGET.y);
             this.inventory = new Inventory();
-            this.setFireRate(10.0);
+            this.setFireRate(5.0);
             this.maxVelocity = 4.0;
             
             this.target = RIGHT_TARGET;
+            this.currentGun = Gun1;
         }
         
         setFireRate(rate) {
@@ -31,11 +44,11 @@ const Player = (() => {
             }
             
             if(Input.isMousePressed()) {
-                this.fireBullet();
+                this.fireGun();
             }
         }
         
-        fireBullet() {
+        fireGun() {
             let now = new Date().getTime();
             if(now >= this.nextAllowedFire) {
                 this.nextAllowedFire = now + this.fireInterval;
@@ -46,13 +59,24 @@ const Player = (() => {
             let playerPos = Game.getPlayer().pos;
             let mousePos = Input.getMousePos();
             let dir = Math.atan2(mousePos.y - playerPos.y, mousePos.x - playerPos.x);
-            let offset = Graphics.toRadians(30.0);
-            let dir1 = dir + offset;
-            let dir2 = dir - offset;
-            let anchorPos = Graphics.getBulletAnchor();
-            Game.getWorld().addGameObject(new Bullet(anchorPos, dir, 20.0));
-            Game.getWorld().addGameObject(new Bullet(anchorPos, dir1, 20.0));
-            Game.getWorld().addGameObject(new Bullet(anchorPos, dir2, 20.0));
+            this.currentGun.fire(this.pos, dir);
+        }
+        
+        incrementGunChoice() {
+            this.toggleGun();
+        }
+        
+        decrementGunChoice() {
+            this.toggleGun();    
+        }
+        
+        toggleGun() {
+            console.log(this.currentGun.id);
+            if(this.currentGun === Gun1) {
+                this.currentGun = Gun2;
+            } else {
+                this.currentGun = Gun1;
+            }
         }
     };
 })();
