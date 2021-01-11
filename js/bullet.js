@@ -7,6 +7,7 @@ const Bullet = (() => {
             this.color = color;
             this.damage = damage || 1;
             this.template = true;
+            this.isBouncy = false;
         }
         
         create(pos, facing) {
@@ -15,6 +16,9 @@ const Bullet = (() => {
             bullet.facing = facing;
             bullet.velocity = Vector.of(FastMath.cos(facing), FastMath.sin(facing)).scale(this.speed);
             bullet.template = false;
+            // todo: make an "options" object so we dont have to rewrite this for every bullet property - { isBouncy: true }
+            // todo: can also apply this to the fundamental properties
+            bullet.isBouncy = this.isBouncy;
             return bullet;
         }
         
@@ -38,7 +42,7 @@ const Bullet = (() => {
                     if(gameObject instanceof Breakable) {
                         gameObject.damage(this.damage);
                         
-                        if(Math.random() > 0) {
+                        if(this.isBouncy) {
                             // TODO if optimization needed, add a vector method to scale components
                             if(collisionResult === 1) {
                                 // hit horizontal side, reverse x velocity sign
