@@ -1,0 +1,6 @@
+.editorconfig
+config.json
+server.bat
+devlogs/*
+__pycache__/*
+cors-server.py
