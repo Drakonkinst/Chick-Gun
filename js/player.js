@@ -6,7 +6,7 @@ const Player = (() => {
         let offset = Graphics.toRadians(15.0);
         let bulletTemplate = new Bullet({
             "size": 10,
-            "speed": 20.0,
+            "speed": 10.0,
             "color": "blue",
             "damage": 1,
             "isBouncy": true
@@ -19,7 +19,7 @@ const Player = (() => {
     const Gun2 = new Gun("gun2", "Gun", 7.5, 35.0, 5.0, function (anchor, dir, gun) {
         let bulletTemplate = new Bullet({
             "size": 15,
-            "speed": 10.0,
+            "speed": 5.0,
             "color": "orange",
             "damage": 3,
             "isBouncy": true
@@ -32,7 +32,7 @@ const Player = (() => {
             super(LEFT_TARGET.x, LEFT_TARGET.y);
             this.inventory = new Inventory();
             this.setFireRate(5.0);
-            this.maxVelocity = 4.0;
+            this.maxVelocity = 2.0;
             
             this.target = RIGHT_TARGET;
             this.currentGun = Gun1;
@@ -40,7 +40,7 @@ const Player = (() => {
         
         setFireRate(rate) {
             this.fireInterval = (1.0 / rate) * 1000.0;
-            this.nextAllowedFire = new Date().getTime();
+            this.nextAllowedFire = performance.now();
         }
         
         doBehavior() {
@@ -62,7 +62,7 @@ const Player = (() => {
         }
         
         fireGun() {
-            let now = new Date().getTime();
+            let now = performance.now();
             if(now >= this.nextAllowedFire) {
                 this.nextAllowedFire = now + this.fireInterval;
             } else {

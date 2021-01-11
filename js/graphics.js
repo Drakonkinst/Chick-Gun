@@ -23,7 +23,9 @@ const Graphics = (() => {
         toRadians,
         toDegrees,
         
+        // initialization phase
         setup() {
+            Game.Init();
             let world = Game.getWorld();
             createCanvas(world.width, world.height);
         },
@@ -43,11 +45,18 @@ const Graphics = (() => {
         },
         
         drawUI() {
-            let numObjects = Game.getWorld().gameObjectList.length;
             stroke(0);
             textAlign(LEFT);
+            
+            let numObjects = Game.getWorld().gameObjectList.length;
             text("Number of Game Objects: " + numObjects, 25, 25);
             text("CLICK to Fire, SCROLL to Select Weapon", 25, 40);
+            
+            textAlign(RIGHT);
+            let fps = frameRate();
+            text("FPS: " + fps.toFixed(2), width - 25, 25);
+            text("MS per Update: " + Game.getCurrentMSPerUpdate().toFixed(2), width - 25, 40);
+            text("Avg MS: " + Game.getAverageMSPerUpdate().toFixed(2), width - 25, 55);
         },
         
         drawGameObjects() {
@@ -146,3 +155,11 @@ const Graphics = (() => {
         }
     };
 })();
+
+function setup() {
+    Graphics.setup();
+}
+
+function draw() {
+    Graphics.draw();
+}

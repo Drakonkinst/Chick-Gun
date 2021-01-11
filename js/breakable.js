@@ -70,7 +70,6 @@ const Breakable = (() => {
             let minY = this.pos.y - halfWidth;
             let maxX = this.pos.x + halfWidth;
             let maxY = this.pos.y + halfWidth;
-            const approximate = halfWidth / 2;
             
             if(x >= minX && x <= maxX && y >= minY && y <= maxY) {
                 let deltaMinX = Math.abs(x - minX);
