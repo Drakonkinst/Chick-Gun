@@ -14,7 +14,8 @@ const Game = (() => {
     
     function randomPos() {
         // Note: INCLUDES DECIMALS!
-        return Vector.of(Math.random() * WORLD_WIDTH, Math.random() * WORLD_HEIGHT);
+        const MARGIN = 50;
+        return Vector.of(MARGIN + Math.random() * (WORLD_WIDTH - MARGIN), MARGIN + Math.random() * (WORLD_HEIGHT - MARGIN));
     }
     
     function randomColor() {
@@ -29,6 +30,7 @@ const Game = (() => {
             world = new World(WORLD_WIDTH, WORLD_HEIGHT);
             clock = setInterval(Game.update, TICK_RATE);
             world.addGameObject(player);
+            Game.Start();
         },
         
         // called after initialization
@@ -68,8 +70,9 @@ const Game = (() => {
     };
 })();
 
+/*
 // document ready
 $(function() {
     Game.Start();
 });
-
+*/
