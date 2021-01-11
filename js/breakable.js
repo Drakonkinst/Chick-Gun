@@ -20,7 +20,8 @@ const Breakable = (() => {
             this.setHealth(health);
             this.width = width;
             this.color = color;
-            this.damageTicks = 0; 
+            this.damageTicks = 0;
+            this.isStationary = true;
         }
         
         update() {

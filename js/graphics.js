@@ -35,13 +35,31 @@ const Graphics = (() => {
             reset();
             background(200);
             
-            
+            this.drawCells();
             
             this.drawGameObjects();
             this.drawPlayer();
             
             this.drawUI();
             
+        },
+        
+        // draws cells of spatial hashmap
+        drawCells() {
+            let cellSize = Game.getWorld().getCellSize();
+            stroke(0);
+            strokeWeight(0.5);
+            
+            // adding + cellSize padding so a border shows up in bottom/right sides
+            // vertical
+            for(let i = 0; i < width + cellSize; i += cellSize) {
+                line(i, 0, i, height);
+            }
+            
+            // horizontal
+            for(let j = 0; j < height + cellSize; j += cellSize) {
+                line(0, j, width, j);
+            }
         },
         
         drawUI() {

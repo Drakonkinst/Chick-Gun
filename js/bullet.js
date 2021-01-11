@@ -40,9 +40,13 @@ const Bullet = (() => {
                 this.shouldDestroy = true;
             }
             
-            let gameObjectList = Game.getWorld().gameObjectList;
+            let gameObjectList = Game.getWorld().gameObjectMap.queryNearby(this.pos);
+            //let gameObjectList = Game.getWorld().gameObjectList;
             
             for(let gameObject of gameObjectList) {
+                if(gameObject === this) {
+                    continue;
+                }
                 // we could do circle intersection with a dynamic hitbox, but
                 // for now we'll just test the center point
                 let collisionResult = gameObject.isCollision(this.pos);
