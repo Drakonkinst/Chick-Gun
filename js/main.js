@@ -1,6 +1,7 @@
 const Game = (() => {
     let world;
     let player;
+    let playerCamera;
     let clock;
     
     let currentMSPerUpdate = 0;
@@ -8,8 +9,8 @@ const Game = (() => {
     let numUpdates = 0;
     let avgMSPerUpdate = 0;
     
-    const WORLD_WIDTH = 1000;
-    const WORLD_HEIGHT = 800;
+    const WORLD_WIDTH = 2000;
+    const WORLD_HEIGHT = 1600;
     const TICK_RATE = 10;   // 10 = nearly twice speed of draw rate (~20)
     
     function randomPos() {
@@ -28,16 +29,21 @@ const Game = (() => {
             Input.setup();
             player = new Player();
             world = new World(WORLD_WIDTH, WORLD_HEIGHT);
+            playerCamera = new Camera(player);
             clock = setInterval(Game.update, TICK_RATE);
             world.addGameObject(player);
+            world.addGameObject(playerCamera);
             Game.Start();
         },
         
         // called after initialization
         Start() {
-            for(let i = 0; i < 50; i++) {
+            
+            for(let i = 0; i < 200; i++) {
                 world.addGameObject(new Breakable(randomPos(), Math.random() * 26 + 50, randomColor(), Math.random() * 5 + 3));
             }
+            //world.addGameObject(new Breakable(Vector.of(500, 100), 500, randomColor(), 999))
+            //world.addGameObject(new Breakable(Vector.of(500, 700), 500, randomColor(), 999));
         },
         
         update() {
@@ -58,6 +64,10 @@ const Game = (() => {
         
         getPlayer() {
             return player;
+        },
+        
+        getCamera() {
+            return playerCamera;
         },
         
         getCurrentMSPerUpdate() {

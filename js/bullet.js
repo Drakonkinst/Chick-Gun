@@ -34,13 +34,15 @@ const Bullet = (() => {
             if(this.template) {
                 return;
             }
-            this.pos.add(this.velocity);
             
-            if(Game.getWorld().isOutOfBounds(this)) {
+            this.pos.add(this.velocity);
+            let world = Game.getWorld();
+            
+            if(world.isOutOfBounds(this.pos) && !world.bouncyWalls) {
                 this.shouldDestroy = true;
             }
             
-            let gameObjectList = Game.getWorld().gameObjectMap.queryNearby(this.pos);
+            let gameObjectList = world.gameObjectMap.querySingle(this.pos);
             //let gameObjectList = Game.getWorld().gameObjectList;
             
             for(let gameObject of gameObjectList) {
@@ -71,6 +73,16 @@ const Bullet = (() => {
                         }
                         
                     }
+                }
+            }
+            
+            if(world.bouncyWalls) {
+                let width = world.width;
+                let height = world.height;
+                if(this.pos.x >= width - 5 || this.pos.x < 0) {
+                    this.velocity = Vector.of(-this.velocity.x, this.velocity.y);
+                } else if(this.pos.y >= height || this.pos.y < 0) {
+                    this.velocity = Vector.of(this.velocity.x, -this.velocity.y);
                 }
             }
         }

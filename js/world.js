@@ -8,6 +8,7 @@ const World = (() => {
             this.gameObjectList = [];
             this.gameObjectMap = new SpatialHashMap(CELL_SIZE);
             this.isPaused = false;
+            this.bouncyWalls = false;
         }
         
         update() {
@@ -45,12 +46,17 @@ const World = (() => {
             this.gameObjectList.push(gameObject);
             let key = this.gameObjectMap.insert(gameObject);
             gameObject.lastCell = key.toString();
+            gameObject.onCreate();
         }
         
-        isOutOfBounds(gameObject) {
-            let x = gameObject.pos.x;
-            let y = gameObject.pos.y;
+        isOutOfBounds(pos) {
+            let x = pos.x;
+            let y = pos.y;
             return x < 0.0 || x >= this.width || y < 0.0 || y >= this.height;
+        }
+        
+        getWorldCenter() {
+            return Vector.of(this.width / 2, this.height / 2);
         }
         
         // get cell size for spatial hashmap

@@ -163,7 +163,7 @@ const SpatialHashMap = (() => {
          * Gets the list of objects at the key associated with the vector and
          * its 8 immediately surrounding keys.
          * 
-         * @param {Vector} vector The vector to query. 
+         * @param {Vector} vector The vector to query.
          * @returns {Array<GameObject>} A list of objects.
          */
         queryNearby(vector) {

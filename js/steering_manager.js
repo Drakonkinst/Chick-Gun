@@ -41,7 +41,9 @@ const SteeringManager = (() => {
                 return;
             }
 
-            slowingRadius = slowingRadius || DEFAULT_SLOWING_DISTANCE;
+            if(slowingRadius == null) {
+                slowingRadius = DEFAULT_SLOWING_DISTANCE;
+            }
 
             let host = this.host;
             let seekForce = targetPos.copy().subtract(host.pos);
@@ -58,15 +60,18 @@ const SteeringManager = (() => {
             this.steering.add(seekForce);
         }
 
-        flee(avoidPos) {
+        flee(avoidPos, strength) {
             if(avoidPos == null) {
                 debug("Null flee command!");
                 return;
             }
 
             let host = this.host;
+            if(strength == null) {
+                strength = host.maxVelocity;
+            }
             let fleeForce = host.pos.copy().subtract(avoidPos);
-            fleeForce.scaleToMagnitude(host.maxVelocity);
+            fleeForce.scaleToMagnitude(strength);
             fleeForce.subtract(host.velocity);
             this.steering.add(fleeForce);
         }

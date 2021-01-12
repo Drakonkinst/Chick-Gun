@@ -36,7 +36,11 @@ const Input = (() => {
 
         getMousePos() {
             // TODO: Could optimize to only create new vector once per tick
-            return new Vector(mouseX, mouseY);
+            let pos = new Vector(mouseX, mouseY);
+            let translateOffset = Graphics.getCameraOffset(Game.getCamera().pos);
+            pos/*.divide(Graphics.getZoom())*/.subtract(translateOffset);
+
+            return pos;
         },
 
         isMousePressed() {

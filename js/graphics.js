@@ -1,4 +1,7 @@
 const Graphics = (() => {
+    const WINDOW_WIDTH = 1000;
+    const WINDOW_HEIGHT = 800;
+    
     function toRadians(degrees) {
         return degrees * (Math.PI / 180);
     }
@@ -23,11 +26,14 @@ const Graphics = (() => {
         toRadians,
         toDegrees,
         
+        getCameraOffset(cameraPos) {
+            return Vector.of(-cameraPos.x + width / 2, -cameraPos.y + height / 2);
+        },
+        
         // initialization phase
         setup() {
             Game.Init();
-            let world = Game.getWorld();
-            createCanvas(world.width, world.height);
+            createCanvas(WINDOW_WIDTH, WINDOW_HEIGHT);
         },
         
         draw() {
@@ -35,18 +41,26 @@ const Graphics = (() => {
             reset();
             background(200);
             
+            let cameraPos = Game.getCamera().pos;
+            let offset = this.getCameraOffset(cameraPos);
+            translate(offset.x, offset.y);
+            
             this.drawCells();
             
             this.drawGameObjects();
             this.drawPlayer();
             
+            translate(-offset.x, -offset.y);
             this.drawUI();
             
         },
         
         // draws cells of spatial hashmap
         drawCells() {
-            let cellSize = Game.getWorld().getCellSize();
+            let world = Game.getWorld();
+            let cellSize = world.getCellSize();
+            let width = world.width;
+            let height = world.height;
             stroke(0);
             strokeWeight(0.5);
             
@@ -64,6 +78,9 @@ const Graphics = (() => {
         
         drawUI() {
             stroke(0);
+            fill(0);
+            strokeWeight(0.5);
+            
             textAlign(LEFT);
             
             let numObjects = Game.getWorld().gameObjectList.length;
@@ -75,6 +92,16 @@ const Graphics = (() => {
             text("FPS: " + fps.toFixed(2), width - 25, 25);
             text("MS per Update: " + Game.getCurrentMSPerUpdate().toFixed(2), width - 25, 40);
             text("Avg MS: " + Game.getAverageMSPerUpdate().toFixed(2), width - 25, 55);
+            
+            const HEALTH_BAR_WIDTH = 250;
+            const HEALTH_BAR_HEIGHT = 25;
+            let player = Game.getPlayer();
+            let healthPercent = player.health / player.maxHealth;
+            noStroke();
+            fill(150);
+            rect(25, height - 25 - HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+            fill(color(250, 77, 77));
+            rect(25, height - 25 - HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH * healthPercent, HEALTH_BAR_HEIGHT);
         },
         
         drawGameObjects() {
@@ -97,6 +124,7 @@ const Graphics = (() => {
             let x = player.pos.x;
             let y = player.pos.y;
             let dir = Math.atan2(mousePos.y - y, mousePos.x - x);
+            this.drawPlayerAvoidSight();
             this.drawUnit(player);
             this.drawGun(player.pos, dir, player.currentGun);
         },
@@ -152,6 +180,7 @@ const Graphics = (() => {
             vertex(backX + (width / 2) * Math.cos(rightDir), backY + (width / 2) * Math.sin(rightDir));
             endShape(CLOSE);
             //line(anchorPos.x, anchorPos.y, mousePos.x, mousePos.y);
+            reset();
         },
         
         drawBullet(bullet) {
@@ -170,6 +199,56 @@ const Graphics = (() => {
             let halfWidth = breakable.width / 2;
             
             rect(breakable.pos.x - halfWidth, breakable.pos.y - halfWidth, breakable.width, breakable.width);
+        },
+        
+        drawPlayerAvoidSight() {
+            let player = Game.getPlayer();
+            let aheadDistance = 50.0 * player.velocity.magnitude();
+            console.log(aheadDistance);
+            let facing = player.facing;
+            let x = player.pos.x;
+            let y = player.pos.y;
+            
+            let halfAheadDistance = aheadDistance / 2.0;
+            let interval = toRadians(30.0);
+            let a2 = facing + interval;
+            let a3 = facing - interval;
+            
+            let p1 = Vector.of(
+                x + aheadDistance * FastMath.cos(facing),
+                y + aheadDistance * FastMath.sin(facing));
+            let p2 = Vector.of(
+                x + halfAheadDistance * FastMath.cos(a2),
+                y + halfAheadDistance * FastMath.sin(a2));
+            let p3 = Vector.of(
+                x + halfAheadDistance * FastMath.cos(a3),
+                y + halfAheadDistance * FastMath.sin(a3));
+            let p4 = Vector.of(
+                x + halfAheadDistance * FastMath.cos(facing),
+                y + halfAheadDistance * FastMath.sin(facing));
+            
+            stroke(0);
+            line(x, y, p1.x, p1.y);
+            line(x, y, p2.x, p2.y);
+            line(x, y, p3.x, p3.y);
+            
+            let objs = [];
+            let pts = [p1, p2, p3, p4, player.pos];
+            let map = Game.getWorld().gameObjectMap;
+            
+            stroke("blue");
+            strokeWeight(2.0);
+            for(let pt of pts) {
+                let list = map.querySingle(pt);
+                for(let obj of list) {
+                    if(obj instanceof Breakable && !(obj in objs) && obj.isCollision(pt)) {
+                        objs.push(obj);
+                        line(x, y, obj.pos.x, obj.pos.y);
+                    }
+                }    
+            }
+            
+            reset();
         }
     };
 })();

@@ -1,5 +1,6 @@
 const Breakable = (() => {
     const DAMAGE_TICKS = 10;
+    const MIN_SIZE = 10;
     
     function min4(a, b, c, d) {
         let arr = [a, b, c, d];
@@ -17,6 +18,9 @@ const Breakable = (() => {
     return class Breakable extends GameObject {
         constructor(pos, width, color, health) {
             super(pos);
+            if(width < MIN_SIZE) {
+                width = MIN_SIZE;
+            }
             this.setHealth(health);
             this.width = width;
             this.color = color;
@@ -28,7 +32,7 @@ const Breakable = (() => {
             if(this.damageTicks > 0) {
                 this.damageTicks--;
             }
-            if(this.width <= 1) {
+            if(this.width <= MIN_SIZE) {
                 this.shouldDestroy = true;
             }
         }
@@ -57,8 +61,43 @@ const Breakable = (() => {
             this.damageTicks = DAMAGE_TICKS;
         }
         
-        onDestroy() {
+        onCreate() {
+            let halfWidth = this.width / 2;
+            let minX = this.pos.x - halfWidth;
+            let minY = this.pos.y - halfWidth;
+            let maxX = this.pos.x + halfWidth;
+            let maxY = this.pos.y + halfWidth;
+            let cellSize = Game.getWorld().getCellSize();
+            let map = Game.getWorld().gameObjectMap;
+            this.storedCells = [this.lastCell];
             
+            for(let x = minX; x < maxX; x += cellSize) {
+                if(x > maxX) {
+                    x = maxX;
+                }
+                for(let y = minY; y < maxY; y += cellSize) {
+                    if(y > maxY) {
+                        y = maxY;
+                    }
+                    let key = map.key(Vector.of(x, y)).toString();
+                    if(!(key in this.storedCells)) {
+                        this.storedCells.push(key);
+                    }
+                }
+            }
+            
+            // skip lastCell
+            for(let i = 1; i < this.storedCells.length; i++) {
+                map.insertAtKey(this, this.storedCells[i]);
+            }
+        }
+        
+        onDestroy() {
+            let map = Game.getWorld().gameObjectMap;
+            // skip lastCell
+            for(let i = 1; i < this.storedCells.length; i++) {
+                map.removeAtKey(this, this.storedCells[i]);
+            }
         }
         
         // square box

@@ -21,6 +21,9 @@ class Vector {
      * @param {number} y The y-coordinate.
      */
     static of(x, y) {
+        if(x == null || y == null) {
+            console.log("Warning: Created vector with null args");
+        }
         return new Vector(x, y);
     }
 

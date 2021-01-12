@@ -23,6 +23,10 @@ const GameObject = (() => {
             }    
         }
         
+        onCreate() {
+            
+        }
+        
         onDestroy() {
             
         }
