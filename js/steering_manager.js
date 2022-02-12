@@ -37,7 +37,7 @@ const SteeringManager = (() => {
 
         seek(targetPos, slowingRadius) {
             if(targetPos == null) {
-                debug("Null seek command!");
+                console.log("Null seek command!");
                 return;
             }
 
@@ -62,7 +62,7 @@ const SteeringManager = (() => {
 
         flee(avoidPos, strength) {
             if(avoidPos == null) {
-                debug("Null flee command!");
+                console.log("Null flee command!");
                 return;
             }
 

@@ -45,7 +45,11 @@ const Graphics = (() => {
             let offset = this.getCameraOffset(cameraPos);
             translate(offset.x, offset.y);
             
-            this.drawCells();
+            //this.drawCells();
+            this.drawGrid();
+            
+            let minimal = false;
+            this.colorNodes(minimal);
             
             this.drawGameObjects();
             this.drawPlayer();
@@ -56,6 +60,27 @@ const Graphics = (() => {
         },
         
         // draws cells of spatial hashmap
+        
+        drawGrid() {
+            let world = Game.getWorld();
+            let cellSize = world.getNodeSize();
+            let width = world.width;
+            let height = world.height;
+            stroke(0);
+            strokeWeight(0.5);
+
+            // adding + cellSize padding so a border shows up in bottom/right sides
+            // vertical
+            for(let i = 0; i < width + cellSize; i += cellSize) {
+                line(i, 0, i, height);
+            }
+
+            // horizontal
+            for(let j = 0; j < height + cellSize; j += cellSize) {
+                line(0, j, width, j);
+            }
+        },
+        
         drawCells() {
             let world = Game.getWorld();
             let cellSize = world.getCellSize();
@@ -73,6 +98,45 @@ const Graphics = (() => {
             // horizontal
             for(let j = 0; j < height + cellSize; j += cellSize) {
                 line(0, j, width, j);
+            }
+        },
+        
+        colorNodes(minimal) {
+            let world = Game.getWorld();
+            let cellSize = world.getNodeSize();
+            let map = world.nodeGrid.grid;
+            let playerNode = world.nodeGrid.getNodeAt(Game.getPlayer().pos);
+            let mouseNode = world.nodeGrid.getNodeAt(Input.getMousePos());
+            let path = Game.temp.path || [];
+            for(let i = 0; i < map.length; i++) {
+                for(let j = 0; j < map[0].length; j++) {
+                    let node = map[i][j];
+                    let color = node.color;
+
+                    if(!minimal && playerNode === node) {
+                        color = "blue";
+                    }
+                    if(!minimal && path.includes(node)) {
+                        color = "red";
+                    }
+                    if(!minimal && Game.temp.targetNode === node) {
+                        color = "pink";
+                    }
+                    if(!node.canWalk()) {
+                        color = "black";
+                    }
+
+                    if(!minimal && mouseNode === node) {
+                        color = "green";
+                    }
+
+                    if(color) {
+                        let upperLeftX = node.pos.x - cellSize / 2;
+                        let upperLeftY = node.pos.y - cellSize / 2;
+                        fill(color);
+                        rect(upperLeftX, upperLeftY, cellSize, cellSize);
+                    }
+                }
             }
         },
         
@@ -204,7 +268,6 @@ const Graphics = (() => {
         drawPlayerAvoidSight() {
             let player = Game.getPlayer();
             let aheadDistance = 50.0 * player.velocity.magnitude();
-            console.log(aheadDistance);
             let facing = player.facing;
             let x = player.pos.x;
             let y = player.pos.y;

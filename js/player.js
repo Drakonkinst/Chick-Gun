@@ -49,35 +49,69 @@ const Player = (() => {
             let next;
             do {
                 next = ~~(Math.random() * PATH.length);
-            } while(next === pathIndex)
+            } while(next === pathIndex);
             //let next = (pathIndex + 1) % PATH.length;
             this.target = PATH[next];
             pathIndex = next;
+            
+            //this.currentPath = Game.getWorld().getFollowTask(this.pos, this.target);
         }
         
+        calculatePath() {
+            
+        }
         doBehavior() {
-            
-            // simple random path
-            let threshold = 50;
-            let dst = this.pos.distance(this.target);
-            if(dst > threshold) {
-                this.steering.seek(this.target, threshold);
-            } else {
-                this.setNextPathTarget();
-            }
-            
-            this.doAvoidBehavior();
-            
-            // min player speed = 0.75 * max
-            let magnitude = this.velocity.magnitude();
-            if(magnitude < 0.75 * this.maxVelocity) {
-                this.velocity.scaleToMagnitude(this.maxVelocity * 0.75)
-            }
             
             // gun input
             if(Input.isMousePressed()) {
                 this.fireGun();
             }
+            
+            // NOTE: big performance hit here, calculate paths live
+            let attempts = 0;
+            //this.currentPath = Game.getWorld().getFollowTask(this.pos, this.target);
+            /*
+            while(attempts < 100 && this.currentPath == null) {
+                this.setNextPathTarget();
+                this.currentPath = Game.getWorld().getFollowTask(this.pos, this.target);
+                attempts++;
+            }
+
+            if(this.currentPath == null) {
+                //console.error("Error: max attempts eached to find path")
+                this.velocity = Vector.of(0, 0);
+                return;
+            }
+            
+            let seekPos = this.currentPath.update(this.pos);
+            attempts = 0;
+            while(attempts < 100 && seekPos == null) {
+                console.warn("Warning: Null seek pos");
+                this.setNextPathTarget();
+                this.calculatePath();
+                seekPos = this.currentPath.update(this.pos);
+                attempts++;
+            }
+            
+            if(seekPos == null) {
+                console.log("Error: Max attempts reaches to calculate new seekPos!");
+                this.velocity = Vector.of(0, 0);
+                return;
+            }
+            
+            this.steering.seek(seekPos, 0);*/
+            
+            
+            /*
+            this.doAvoidBehavior();
+            
+            // min player speed = 0.75 * max
+            
+            let magnitude = this.velocity.magnitude();
+            if(magnitude < 0.75 * this.maxVelocity) {
+                this.velocity.scaleToMagnitude(this.maxVelocity * 0.75)
+            }
+            //*/
         }
         
         doAvoidBehavior() {

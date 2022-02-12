@@ -27,8 +27,9 @@ const Game = (() => {
         // called during initialization
         Init() {
             Input.setup();
-            player = new Player();
+            
             world = new World(WORLD_WIDTH, WORLD_HEIGHT);
+            player = new Player();
             playerCamera = new Camera(player);
             clock = setInterval(Game.update, TICK_RATE);
             world.addGameObject(player);
@@ -38,12 +39,24 @@ const Game = (() => {
         
         // called after initialization
         Start() {
-            
+            /*
             for(let i = 0; i < 200; i++) {
                 world.addGameObject(new Breakable(randomPos(), Math.random() * 26 + 50, randomColor(), Math.random() * 5 + 3));
             }
             //world.addGameObject(new Breakable(Vector.of(500, 100), 500, randomColor(), 999))
             //world.addGameObject(new Breakable(Vector.of(500, 700), 500, randomColor(), 999));
+            //*/
+            
+            let density = 0.3;
+            let grid = world.nodeGrid.grid;
+            for(let i = 0; i < grid.length; ++i) {
+                for(let j = 0; j < grid[0].length; ++j) {
+                    if(Math.random() < density) {
+                        let node = grid[i][j];
+                        node.walkable = false;
+                    }
+                }
+            }
         },
         
         update() {
@@ -76,7 +89,10 @@ const Game = (() => {
         
         getAverageMSPerUpdate() {
             return avgMSPerUpdate;
-        }
+        },
+        
+        // storing temporary display variables
+        temp: {}
     };
 })();
 

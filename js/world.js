@@ -1,5 +1,6 @@
 const World = (() => {
     const CELL_SIZE = 100;
+    const NODE_SIZE = 50;
     
     return class World {
         constructor(width, height) {
@@ -9,6 +10,7 @@ const World = (() => {
             this.gameObjectMap = new SpatialHashMap(CELL_SIZE);
             this.isPaused = false;
             this.bouncyWalls = false;
+            this.nodeGrid = new NodeGrid(this, NODE_SIZE);
         }
         
         update() {
@@ -49,6 +51,16 @@ const World = (() => {
             gameObject.onCreate();
         }
         
+        getFollowTask(start, end) {
+            let path = this.nodeGrid.calculatePath(start, end);
+            if(path == null || path.length <= 0) {
+                return null;
+            }
+            return new FollowPathTask(path, end);
+        }
+        
+        /* ACCESSORS */
+        
         isOutOfBounds(pos) {
             let x = pos.x;
             let y = pos.y;
@@ -62,6 +74,10 @@ const World = (() => {
         // get cell size for spatial hashmap
         getCellSize() {
             return CELL_SIZE;
+        }
+        
+        getNodeSize() {
+            return NODE_SIZE;
         }
     };
 })();
